@@ -15,6 +15,7 @@ const compat = new FlatCompat({
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
   { ignores: [".github/", ".husky/", "node_modules/", ".next/", "src/components/ui", "*.config.ts", "*.mjs"] },
   {
@@ -43,7 +44,6 @@ export default [
   pluginReact.configs.flat.recommended,
   securityPlugin.configs.recommended,
   ...tseslint.configs.recommended,
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
       // Prettier integration rules

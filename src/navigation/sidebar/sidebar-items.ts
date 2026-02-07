@@ -342,7 +342,7 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "Base De Datos",
-        url: "/mail",
+        url: "/dashboard/database",
         icon: Database,
       },
       {

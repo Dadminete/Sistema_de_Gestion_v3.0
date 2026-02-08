@@ -357,7 +357,7 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         title: "Permisos",
-        url: "/kanban",
+        url: "/dashboard/permissions",
         icon: Shield,
       },
       {
@@ -411,12 +411,12 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         title: "Roles",
-        url: "/roles",
+        url: "/dashboard/roles",
         icon: Lock,
       },
       {
         title: "Usuarios",
-        url: "/users",
+        url: "/dashboard/users",
         icon: Users,
       },
       {

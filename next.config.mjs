@@ -3,7 +3,13 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  allowedDevOrigins: ["http://172.16.0.23:3000"],
+  allowedDevOrigins: [
+    "http://localhost:3000",
+    "http://172.16.0.23:3000",
+    "http://172.16.0.23",
+    "localhost",
+    "172.16.0.23",
+  ],
   async redirects() {
     return [
       {

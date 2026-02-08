@@ -30,6 +30,7 @@ interface Backup {
 
 export default function DatabasePage() {
     const [backups, setBackups] = useState<Backup[]>([]);
+    const [config, setConfig] = useState<{ backupPath: string; databaseUrl: string } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isBackingUp, setIsBackingUp] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -39,7 +40,12 @@ export default function DatabasePage() {
         try {
             const res = await fetch("/api/database/backups");
             const data = await res.json();
-            setBackups(data);
+            if (Array.isArray(data)) {
+                setBackups(data);
+            } else {
+                console.error("Invalid backups data:", data);
+                setBackups([]);
+            }
         } catch (error) {
             toast.error("Error al cargar los respaldos");
         } finally {
@@ -47,8 +53,19 @@ export default function DatabasePage() {
         }
     };
 
+    const fetchConfig = async () => {
+        try {
+            const res = await fetch("/api/database/config");
+            const data = await res.json();
+            setConfig(data);
+        } catch (error) {
+            console.error("Error fetching config:", error);
+        }
+    };
+
     useEffect(() => {
         fetchBackups();
+        fetchConfig();
     }, []);
 
     const handleCreateBackup = async () => {
@@ -61,13 +78,17 @@ export default function DatabasePage() {
                 toast.success("Respaldo creado con éxito");
                 fetchBackups();
             } else {
-                throw new Error(data.error);
+                throw new Error(data.error || "Error desconocido");
             }
         } catch (error: any) {
             toast.error(`Error al crear respaldo: ${error.message}`);
         } finally {
             setIsBackingUp(false);
         }
+    };
+
+    const handleDownload = (fileName: string) => {
+        window.open(`/api/database/download?fileName=${encodeURIComponent(fileName)}`, "_blank");
     };
 
     const handleRestore = async (fileName: string) => {
@@ -83,7 +104,7 @@ export default function DatabasePage() {
             if (data.success) {
                 toast.success("Restauración completada con éxito");
             } else {
-                throw new Error(data.error);
+                throw new Error(data.error || "Error desconocido");
             }
         } catch (error: any) {
             toast.error(`Error en la restauración: ${error.message}`);
@@ -102,9 +123,11 @@ export default function DatabasePage() {
             if (data.success) {
                 toast.success("Respaldo eliminado");
                 fetchBackups();
+            } else {
+                throw new Error(data.error || "Error al eliminar");
             }
-        } catch (error) {
-            toast.error("Error al eliminar el respaldo");
+        } catch (error: any) {
+            toast.error(`Error: ${error.message}`);
         }
     };
 
@@ -146,7 +169,7 @@ export default function DatabasePage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">Activa</div>
-                        <p className="text-xs text-muted-foreground">Neon DB (AWS - us-east-1)</p>
+                        <p className="text-xs text-muted-foreground">{config?.databaseUrl || "Neon DB"}</p>
                     </CardContent>
                 </Card>
                 <Card className="border-l-4 border-l-primary shadow-sm">
@@ -173,12 +196,14 @@ export default function DatabasePage() {
                 </Card>
                 <Card className="border-l-4 border-l-red-500 shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Capacidad Libre</CardTitle>
+                        <CardTitle className="text-sm font-medium">Almacenamiento</CardTitle>
                         <AlertTriangle className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">94 GB</div>
-                        <p className="text-xs text-muted-foreground">Ruta: E:\Web\Backups</p>
+                        <div className="text-sm font-bold truncate mb-1" title={config?.backupPath}>
+                            {config?.backupPath || "E:\\Backups"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Ruta configurada en .env</p>
                     </CardContent>
                 </Card>
             </div>
@@ -240,7 +265,13 @@ export default function DatabasePage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                                    onClick={() => handleDownload(backup.name)}
+                                                    title="Descargar"
+                                                >
                                                     <Download className="h-4 w-4" />
                                                 </Button>
                                                 <Button
@@ -248,6 +279,7 @@ export default function DatabasePage() {
                                                     size="icon"
                                                     className="h-8 w-8 text-amber-600 hover:text-amber-600 hover:bg-amber-100"
                                                     onClick={() => handleRestore(backup.name)}
+                                                    title="Restaurar"
                                                 >
                                                     <RotateCcw className="h-4 w-4" />
                                                 </Button>
@@ -256,6 +288,7 @@ export default function DatabasePage() {
                                                     size="icon"
                                                     className="h-8 w-8 text-red-600 hover:text-red-600 hover:bg-red-100"
                                                     onClick={() => handleDelete(backup.name)}
+                                                    title="Eliminar"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -272,7 +305,7 @@ export default function DatabasePage() {
             <div className="flex items-center gap-4 p-4 rounded-lg bg-primary/5 border border-primary/20 text-sm opacity-80">
                 <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
                 <p>
-                    <strong>Seguridad:</strong> Los respaldos se guardan cifrados y en local para mayor privacidad.
+                    <strong>Seguridad:</strong> Los respaldos se guardan en local para mayor privacidad.
                     Se recomienda descargar copias importantes de forma periódica.
                 </p>
             </div>

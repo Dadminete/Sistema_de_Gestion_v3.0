@@ -55,6 +55,7 @@ import {
   TrendingUpDown,
   ServerCog,
   Layers,
+  TrendingDown,
   type LucideIcon,
 } from "lucide-react";
 
@@ -173,6 +174,16 @@ export const sidebarItems: NavGroup[] = [
             title: "Listado Clientes",
             url: "/dashboard/clientes/listado",
             icon: List,
+          },
+          {
+            title: "Reporte de Ingresos",
+            url: "/dashboard/listados/ingresos",
+            icon: TrendingUp,
+          },
+          {
+            title: "Reporte de Gastos",
+            url: "/dashboard/listados/gastos",
+            icon: TrendingDown,
           },
           {
             title: "Listado Inactivos",

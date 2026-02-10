@@ -8,6 +8,7 @@ import securityPlugin from "eslint-plugin-security";
 import prettier from "eslint-plugin-prettier";
 import unicorn from "eslint-plugin-unicorn";
 import sonarjs from "eslint-plugin-sonarjs";
+import nextPlugin from "@next/eslint-plugin-next";
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
@@ -15,11 +16,17 @@ const compat = new FlatCompat({
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...compat.extends("next/core-web-vitals", "next/typescript").map(config => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { name, ...rest } = config;
-    return rest;
-  }),
+  {
+    plugins: {
+      "@next/next": nextPlugin,
+    },
+    rules: {
+      ...nextPlugin.configs["recommended"].rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+    },
+  },
+  // React Hooks (via compat because it might not support flat config yet)
+  ...compat.extends("plugin:react-hooks/recommended"),
   { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
   { ignores: [".github/", ".husky/", "node_modules/", ".next/", "src/components/ui", "*.config.ts", "*.mjs"] },
   {

@@ -401,7 +401,7 @@ export default function PermissionsPage() {
                                         <TableRow key={p.id} className="hover:bg-primary/5 transition-colors group">
                                             <TableCell className="font-mono text-[11px] font-bold text-primary py-4">
                                                 <div className="flex items-center gap-2">
-                                                    {p.esSistema && <Star className="h-3 w-3 text-amber-500 fill-amber-500" title="Sistema" />}
+                                                    {p.esSistema && <span title="Sistema"><Star className="h-3 w-3 text-amber-500 fill-amber-500" /></span>}
                                                     {p.nombrePermiso}
                                                 </div>
                                             </TableCell>
@@ -485,8 +485,8 @@ export default function PermissionsPage() {
                                         key={i}
                                         onClick={() => setCurrentPage(i + 1)}
                                         className={`h-6 w-6 rounded-md text-[10px] font-bold transition-all ${currentPage === i + 1
-                                                ? "bg-primary text-white shadow-sm"
-                                                : "hover:bg-muted text-muted-foreground"
+                                            ? "bg-primary text-white shadow-sm"
+                                            : "hover:bg-muted text-muted-foreground"
                                             }`}
                                     >
                                         {i + 1}
